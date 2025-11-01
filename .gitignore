@@ -1,0 +1,37 @@
+# Compilación y dependencias
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Archivos de logs
+*.log
+
+# Configuración de IDEs
+.idea/
+.vscode/
+*.iml
+*.class
+
+# Archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos temporales de Git
+*.swp
+*.swo
+
+# Archivos de backup
+*~
+*.bak
+
+# Archivos de ejecución local
+.env
+*.local
+
+# Reportes generados
+surefire-reports/
+site/
+
+# Artefactos descargados
+*.jar
+*.war
+*.ear
