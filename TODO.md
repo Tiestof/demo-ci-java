@@ -1,0 +1,3 @@
+- [ ] Configurar CI
+- [ ] Agregar Maven
+- [ ] Crear tests unitarios
