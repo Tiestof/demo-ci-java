@@ -165,13 +165,14 @@ demo-ci-java
 
 ## Cambios en el pom.xml respecto a la Actividad 1
 
-| Componente                           | Descripción del cambio                                                                                                               | Propósito                                                   |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
-| **Dependencias Cucumber**            | Se agregaron `cucumber-java`, `cucumber-junit` y `cucumber-core` (versión 7.14.0).                                                   | Permitir escribir y ejecutar pruebas BDD con Cucumber.      |
-| **JUnit 4**                          | Se añadió `junit:4.13.2`.                                                                                                            | Requerido por el runner `@RunWith(Cucumber.class)`.         |
-| **Provider de ejecución (Surefire)** | Se fijó `maven-surefire-plugin` en versión 2.22.2 y se añadió `surefire-junit4`.                                                     | Garantizar compatibilidad con JUnit 4 y Cucumber.           |
-| **Configuración del plugin**         | Se incluyó `<includes>**/RunCucumberTest.java</includes>` y la propiedad `cucumber.plugin=pretty, html:target/cucumber-report.html`. | Ejecutar únicamente las pruebas BDD y generar reporte HTML. |
-| **Ejecución separada**               | Los tests unitarios (Actividad 1) y los BDD (Actividad 2) se ejecutan por separado.                                                  | Mantiene independencia entre niveles de prueba.             |
+| **Componente**                       | **Descripción del cambio**                                                                                 | **Propósito**                                           |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| **Dependencias Cucumber**            | Se agregaron:<br>• `cucumber-java`<br>• `cucumber-junit`<br>• `cucumber-core` (v7.14.0)                    | Permitir escribir y ejecutar pruebas BDD con Cucumber.  |
+| **JUnit 4**                          | Se añadió `junit:4.13.2`.                                                                                  | Requerido por el runner `@RunWith(Cucumber.class)`.     |
+| **Provider de ejecución (Surefire)** | Se fijó `maven-surefire-plugin` en versión **2.22.2** y se agregó `surefire-junit4`.                       | Asegurar compatibilidad con Cucumber (que usa JUnit 4). |
+| **Configuración del plugin**         | Se incluyó:<br>• `**/RunCucumberTest.java`<br>• `cucumber.plugin=pretty, html:target/cucumber-report.html` | Ejecutar solo los tests BDD y generar reporte HTML.     |
+| **Ejecución separada**               | Los tests unitarios (Actividad 1) y los BDD (Actividad 2) se ejecutan de forma independiente.              | Mantener independencia entre niveles de prueba.         |
+
 
 
 ## Resumen
