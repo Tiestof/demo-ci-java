@@ -29,13 +29,13 @@ demo-ci-java/
 
 ## Comandos utilizados
 
-## Ejecución de pruebas
+### Ejecución de pruebas
 mvn clean test
 
-## Generación de reporte HTML
+### Generación de reporte HTML
 mvn surefire-report:report-only
 
-## Validar versión de Maven y Java
+### Validar versión de Maven y Java
 mvn -v
 java -version
 
