@@ -101,6 +101,104 @@ Reportes navegables y descargables desde GitHub Actions
 
 Código versionado con buenas prácticas de Git
 
+
+# Actividad 2 – Pruebas Funcionales con Cucumber (BDD)
+
+En esta segunda parte se amplió el proyecto de la Actividad 1 para incluir pruebas funcionales usando el enfoque BDD (Behavior Driven Development) con Cucumber + JUnit 4.
+El objetivo es validar comportamientos completos del sistema (por ejemplo, el flujo de login), además de las pruebas unitarias ya implementadas previamente.
+
+## Nueva estructura del proyecto
+
+demo-ci-java
+│   .gitignore
+│   CONTRIBUTING.md
+│   pom.xml
+│   README.md
+│   TODO.md
+│
+├───.github
+│   └───workflows
+│           ci.yml
+│
+├───.vscode
+│       settings.json
+│
+├───src
+│   ├───main/java/com/demo
+│   │       App.java
+│   │       Calculadora.java
+│   │
+│   └───test/java/com/demo
+│       │   CalculadoraTest.java
+│       │   PrimerTest.java
+│       │   RunCucumberTest.java
+│       │
+│       ├───helpers
+│       │       AuthHelper.java
+│       │
+│       └───steps
+│               LoginSteps.java
+│
+└───src/test/resources
+    │   junit-platform.properties
+    │
+    └───com/demo/features
+            login.feature
+
+## Archivos creados y modificados
+
+### Archivos nuevos
+| Archivo                     | Ubicación                               | Descripción                                                                   |
+| --------------------------- | --------------------------------------- | ----------------------------------------------------------------------------- |
+| `login.feature`             | `src/test/resources/com/demo/features/` | Define los escenarios BDD para el flujo de login (casos válidos e inválidos). |
+| `LoginSteps.java`           | `src/test/java/com/demo/steps/`         | Implementa los pasos (`Given`, `When`, `Then`) definidos en `login.feature`.  |
+| `AuthHelper.java`           | `src/test/java/com/demo/helpers/`       | Clase auxiliar que simula la autenticación de usuario.                        |
+| `RunCucumberTest.java`      | `src/test/java/com/demo/`               | Clase *runner* que ejecuta los escenarios de Cucumber mediante JUnit 4.       |
+| `junit-platform.properties` | `src/test/resources/`                   | Configura parámetros de ejecución y reportes de Cucumber.                     |
+
+### Archivos modificados
+
+| Archivo     | Cambio realizado                                                            |
+| ----------- | --------------------------------------------------------------------------- |
+| `pom.xml`   | Se agregaron dependencias y configuración para integrar Cucumber y JUnit 4. |
+| `README.md` | Se actualizó con documentación de la Actividad 2.                           |
+
+## Cambios en el pom.xml respecto a la Actividad 1
+
+| Componente                           | Descripción del cambio    | Propósito                                                   |
+------------------------------------------------------------------------------------------------------------------------------------ | 
+| **Dependencias Cucumber**            | Se agregaron `cucumber-java`, `cucumber-junit` y `cucumber-core` (versión 7.14.0).                                                   | Permitir escribir y ejecutar pruebas BDD con Cucumber.      |
+| **JUnit 4**                          | Se añadió `junit:4.13.2`.                                                                                                            | Requerido por el runner `@RunWith(Cucumber.class)`.         |
+| **Provider de ejecución (Surefire)** | Se fijó `maven-surefire-plugin` en versión 2.22.2 y se añadió `surefire-junit4`.                                                     | Garantizar compatibilidad con JUnit 4 y Cucumber.           |
+| **Configuración del plugin**         | Se incluyó `<includes>**/RunCucumberTest.java</includes>` y la propiedad `cucumber.plugin=pretty, html:target/cucumber-report.html`. | Ejecutar únicamente las pruebas BDD y generar reporte HTML. |
+| **Ejecución separada**               | Los tests unitarios (Actividad 1) y los BDD (Actividad 2) se ejecutan por separado.                                                  | Mantiene independencia entre niveles de prueba.             |
+
+## Resumen
+
+Las pruebas unitarias de la Actividad 1 se mantienen sin cambios (JUnit 5).
+
+Se añadieron pruebas funcionales BDD que describen escenarios de negocio.
+
+El proyecto ahora integra Cucumber + JUnit 4 junto con JUnit 5, permitiendo ambos estilos de prueba.
+
+Los reportes BDD se generan automáticamente en: target/cucumber-report.html
+
+## Ejemplo de ejecución
+
+mvn clean test
+
+### Ejemplo de salida esperada en consola:
+
+Scenario: Login exitoso con credenciales válidas
+  Given que el usuario está en la pantalla de login
+  When ingresa usuario "admin" y contraseña "1234"
+  Then el sistema muestra el mensaje "Bienvenido admin"
+
+Scenario Outline: Login fallido con credenciales inválidas o vacías
+  ...
+BUILD SUCCESS
+Report generated: target/cucumber-report.html
+
 ## Autores
 
 Franco Gatica Salinas
