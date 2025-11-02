@@ -91,14 +91,14 @@ jobs:
                 and any(.steps[]?; .result?.status=="failed"))] 
                 | length' target/cucumber.json)
             PASSED=$((TOTAL-FAILED))
-            echo "### 🧩 BDD Summary" >> $GITHUB_STEP_SUMMARY
+            echo "###  BDD Summary" >> $GITHUB_STEP_SUMMARY
             echo "- Scenarios: **$TOTAL**" >> $GITHUB_STEP_SUMMARY
             echo "- Passed: **$PASSED**" >> $GITHUB_STEP_SUMMARY
             echo "- Failed: **$FAILED**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "👉 Reporte HTML: descargable en **Artifacts > cucumber-report**" >> $GITHUB_STEP_SUMMARY
+            echo " Reporte HTML: descargable en **Artifacts > cucumber-report**" >> $GITHUB_STEP_SUMMARY
           else
-            echo "### 🧩 BDD Summary" >> $GITHUB_STEP_SUMMARY
+            echo "### BDD Summary" >> $GITHUB_STEP_SUMMARY
             echo "_No se encontró target/cucumber.json_" >> $GITHUB_STEP_SUMMARY
           fi
 
@@ -139,13 +139,13 @@ jobs:
             P95=$(jq -r '.metrics.http_req_duration.values["p(95)"] // .metrics.http_req_duration["p(95)"] // 0' target/perf/summary.json)
             ERR=$(jq -r '.metrics.http_req_failed.rate // .metrics.http_req_failed.values.rate // 0' target/perf/summary.json)
 
-            echo "### 🚀 Performance Summary (k6)" >> $GITHUB_STEP_SUMMARY
+            echo "### Performance Summary (k6)" >> $GITHUB_STEP_SUMMARY
             echo "- Throughput (req/s): **$TPS**" >> $GITHUB_STEP_SUMMARY
             echo "- Latencia p95 (ms): **$P95**" >> $GITHUB_STEP_SUMMARY
             echo "- Error rate: **$ERR**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "_Umbrales objetivo_: p95 < **500 ms**, error rate < **1%**" >> $GITHUB_STEP_SUMMARY
           else
-            echo "### 🚀 Performance Summary (k6)" >> $GITHUB_STEP_SUMMARY
+            echo "### Performance Summary (k6)" >> $GITHUB_STEP_SUMMARY
             echo "_No se encontró target/perf/summary.json_" >> $GITHUB_STEP_SUMMARY
           fi
