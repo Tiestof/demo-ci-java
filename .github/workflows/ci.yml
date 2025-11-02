@@ -1,4 +1,4 @@
-name: CI - Unit & BDD Tests
+name: CI - Unit, BDD & Perf
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
           name: surefire-reports
           path: target/surefire-reports/**
 
-      - name: Generate HTML test report
+      - name: Generate HTML Unit Test Report
         run: mvn surefire-report:report-only
 
       - name: Upload HTML Unit Test Report
@@ -44,7 +44,7 @@ jobs:
   bdd-tests:
     name: BDD Tests (Cucumber)
     runs-on: ubuntu-latest
-    needs: unit-tests  # ejecuta después del job anterior
+    needs: unit-tests
 
     steps:
       - name: Checkout
@@ -57,12 +57,95 @@ jobs:
           java-version: '17'
           cache: 'maven'
 
-      - name: Run Cucumber Scenarios
-        run: mvn -B -ntp clean test
+      # Ejecuta Cucumber y genera también JSON (además del HTML)
+      - name: Run Cucumber with JSON output
+        run: |
+          mvn -B -ntp clean test -Dcucumber.plugin="pretty, html:target/cucumber-report.html, json:target/cucumber.json"
 
-      - name: Upload Cucumber HTML Report
+      - name: Upload Cucumber HTML
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cucumber-report
           path: target/cucumber-report.html
+
+      - name: Upload Cucumber JSON
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-json
+          path: target/cucumber.json
+
+      # Instala jq para parsear el JSON de Cucumber
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # Resume resultados BDD en el Job Summary de GitHub Actions
+      - name: BDD Summary (scenarios pass/fail)
+        if: always()
+        run: |
+          if [ -f target/cucumber.json ]; then
+            TOTAL=$(jq '[.[].elements[] | select(.keyword=="Scenario" or .type=="scenario")] | length' target/cucumber.json)
+            FAILED=$(jq '[.[].elements[] 
+                | select((.keyword=="Scenario" or .type=="scenario") 
+                and any(.steps[]?; .result?.status=="failed"))] 
+                | length' target/cucumber.json)
+            PASSED=$((TOTAL-FAILED))
+            echo "### 🧩 BDD Summary" >> $GITHUB_STEP_SUMMARY
+            echo "- Scenarios: **$TOTAL**" >> $GITHUB_STEP_SUMMARY
+            echo "- Passed: **$PASSED**" >> $GITHUB_STEP_SUMMARY
+            echo "- Failed: **$FAILED**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "👉 Reporte HTML: descargable en **Artifacts > cucumber-report**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### 🧩 BDD Summary" >> $GITHUB_STEP_SUMMARY
+            echo "_No se encontró target/cucumber.json_" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  perf-k6:
+    name: Performance (k6)
+    runs-on: ubuntu-latest
+    needs: bdd-tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      # Ejecuta k6 y exporta summary.json
+      - name: Run k6 with summary export
+        run: |
+          mkdir -p target/perf
+          k6 run --summary-export=target/perf/summary.json tests/performance/login_performance_test.js
+
+      - name: Upload k6 summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-summary
+          path: target/perf/summary.json
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      # Resume métricas clave de performance en el Job Summary
+      - name: Performance Summary (RPS / p95 / error rate)
+        if: always()
+        run: |
+          if [ -f target/perf/summary.json ]; then
+            TPS=$(jq -r '.metrics.http_reqs.rate // .metrics.http_reqs.values.rate // 0' target/perf/summary.json)
+            P95=$(jq -r '.metrics.http_req_duration.values["p(95)"] // .metrics.http_req_duration["p(95)"] // 0' target/perf/summary.json)
+            ERR=$(jq -r '.metrics.http_req_failed.rate // .metrics.http_req_failed.values.rate // 0' target/perf/summary.json)
+
+            echo "### 🚀 Performance Summary (k6)" >> $GITHUB_STEP_SUMMARY
+            echo "- Throughput (req/s): **$TPS**" >> $GITHUB_STEP_SUMMARY
+            echo "- Latencia p95 (ms): **$P95**" >> $GITHUB_STEP_SUMMARY
+            echo "- Error rate: **$ERR**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "_Umbrales objetivo_: p95 < **500 ms**, error rate < **1%**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### 🚀 Performance Summary (k6)" >> $GITHUB_STEP_SUMMARY
+            echo "_No se encontró target/perf/summary.json_" >> $GITHUB_STEP_SUMMARY
+          fi
