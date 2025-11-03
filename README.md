@@ -1,4 +1,29 @@
-#  Proyecto Demo CI Java
+# Proyecto Demo CI Java  
+**Autor:** Franco Gatica Salinas  
+**Asignatura:** Automatización de Pruebas – Unidad II  
+**Institución:** IPLACEX – Escuela de Informática y Telecomunicaciones  
+**Docente:** Mauricio Ignacio Saavedra Hassan  
+**Versión del proyecto:** 2.0 (Integración Continua + BDD + Performance)  
+**Fecha de entrega:** Noviembre 2025  
+
+---
+
+### Descripción General
+
+Este repositorio contiene el desarrollo completo de las **Actividades 1 y 2** del Taller TA_4, correspondientes a la **Unidad II** de la asignatura *Automatización de Pruebas*.  
+El objetivo principal es implementar un flujo de **Integración Continua (CI)** profesional para un proyecto Java, incorporando:
+
+- Gestión de versiones con **Git y GitHub**.  
+- Construcción y pruebas automatizadas con **Maven y JUnit 5**.  
+- Escenarios funcionales BDD con **Cucumber + JUnit 4**.  
+- Pruebas de rendimiento con **k6**.  
+- Generación automática de **reportes, métricas y alertas** dentro del pipeline de CI.  
+
+El proyecto refleja la aplicación práctica de los contenidos abordados en los materiales ME_1 a ME_4 y sigue las pautas establecidas en el taller TA_4.
+
+---
+
+
 
 Repositorio desarrollado como parte de la **Actividad 1 - TA_4** para la asignatura de Automatización de Pruebas.  
 
