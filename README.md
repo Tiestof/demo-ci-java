@@ -201,7 +201,71 @@ Scenario Outline: Login fallido con credenciales inválidas o vacías
 BUILD SUCCESS
 Report generated: target/cucumber-report.html
 
-## Autores
+## Integración de métricas de pruebas (simulación de dashboard en CI)
+
+Para esta etapa se amplió el pipeline de CI (.github/workflows/ci.yml) con nuevos jobs que muestran resultados de pruebas funcionales (BDD) y de rendimiento (k6) directamente dentro de GitHub Actions, sin necesidad de usar herramientas externas como Grafana o Prometheus.
+
+### ¿Qué se agregó?
+
+#### Job bdd-tests (Cucumber)
+
+Ejecuta los escenarios BDD definidos en login.feature.
+
+Genera dos reportes:
+
+target/cucumber-report.html → reporte navegable.
+
+target/cucumber.json → usado para extraer métricas.
+
+Usa la herramienta jq para leer el archivo JSON y calcula:
+
+Total de escenarios.
+
+Escenarios pasados y fallidos.
+
+Muestra un resumen con métricas en el panel Job Summary de GitHub Actions (por ejemplo: “5 escenarios, 0 fallidos”).
+
+Esto simula un dashboard funcional, mostrando los resultados BDD directamente en el pipeline.
+
+#### Job perf-k6 (k6 Performance Test)
+
+Ejecuta el script tests/performance/login_performance_test.js, que simula 5 usuarios concurrentes por 10 segundos contra el endpoint público https://test.k6.io/.
+
+Exporta un archivo target/perf/summary.json con todas las métricas del test.
+
+Extrae con jq los valores clave:
+
+Throughput (req/s)
+
+Latencia p95 (ms)
+
+Error rate (%)
+
+Los publica como un resumen visual en el Job Summary de Actions (tal como se ve en la imagen).
+
+Además, guarda el archivo summary.json como artefacto descargable para análisis posterior.
+
+Esto representa un mini-dashboard de rendimiento generado automáticamente dentro del pipeline.
+
+#### ejemplo de salida esperada
+
+Job Summary de GitHub Actions:
+
+  Throughput (req/s): ~9.5
+  Latencia p95: ~24.7 ms
+  Error rate: 0
+
+## Tecnologías utilizadas
+
+GitHub Actions → motor de CI y visualización.
+
+Apache Maven → ejecución de pruebas unitarias y BDD.
+
+k6 → pruebas de carga y performance.
+
+jq → análisis de archivos JSON para extraer métricas.
+
+# Autores
 
 Franco Gatica Salinas
 Proyecto desarrollado como parte de la Actividad 1 – TA_4: Automatización de Pruebas
