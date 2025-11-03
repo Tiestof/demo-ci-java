@@ -265,6 +265,67 @@ k6 → pruebas de carga y performance.
 
 jq → análisis de archivos JSON para extraer métricas.
 
+
+Configuración de alertas automáticas ante fallos o degradaciones
+
+En esta sección se explica cómo se configuraron y cómo se pueden ampliar las alertas automáticas del pipeline de Integración Continua (CI) para detectar errores o degradaciones tanto en pruebas funcionales (unitarias y BDD) como en pruebas de rendimiento (k6).
+
+### Alertas nativas de GitHub Actions
+
+GitHub Actions envía notificaciones automáticas cuando una ejecución del workflow falla o cambia de estado.
+Estas alertas se pueden recibir por:
+
+Correo electrónico (activado por defecto en tu cuenta de GitHub).
+
+Notificaciones web o móviles dentro de la interfaz de GitHub.
+
+Integraciones externas (Slack, Teams, Discord, etc.).
+
+### Configuración básica
+
+Ir a Settings → Notifications en el perfil de GitHub.
+
+Activar:
+
+“Email” → para recibir alertas por fallos de ejecución.
+
+“Web and mobile” → para notificaciones dentro de la plataforma.
+
+Cualquier error en el pipeline (por ejemplo, una prueba fallida o umbral incumplido) generará automáticamente una alerta.
+
+### Alertas por degradación de rendimiento (k6)
+
+En el archivo login_performance_test.js se definieron umbrales
+
+  http_req_failed: ['rate<0.01'],   // Menos de 1% de errores permitidos
+  http_req_duration: ['p(95)<500'], // 95% de las solicitudes debajo de 500 ms
+
+Si alguno de estos umbrales se incumple:
+
+k6 devuelve un código de error 99.
+
+GitHub Actions marca el job como “Failed”.
+
+Se dispara automáticamente una alerta por correo y se visualiza en el panel de Actions.
+
+### Alertas por fallos funcionales (BDD y unitarias)
+
+Cuando una prueba unitaria o un escenario BDD falla:
+
+Maven devuelve código de error 1.
+
+GitHub Actions marca el job correspondiente como “Failed”.
+
+Automáticamente se envía un correo o notificación al responsable del repositorio.
+
+### Resultado esperado
+
+Cualquier fallo o degradación marca el pipeline en rojo.
+
+GitHub Actions notifica automáticamente por correo o integración externa.
+
+El equipo puede revisar el detalle en el log o en el resumen del Job.
+
 # Autores
 
 Franco Gatica Salinas
